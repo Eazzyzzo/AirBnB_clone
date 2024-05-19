@@ -4,6 +4,7 @@ Module for BaseModel unittest
 """
 import unittest
 from models.base_model import BaseModel
+from datetime import datetime
 
 
 class TestBaseModel(unittest.TestCase):
@@ -56,3 +57,7 @@ class TestBaseModel(unittest.TestCase):
         self.assertTrue(str(my_model).startswith('[BaseModel]'))
         self.assertIn(my_model.id, str(my_model))
         self.assertIn(str(my_model.__dict__), str(my_model))
+
+
+if __name__ == '__main__':
+    unittest.main()
