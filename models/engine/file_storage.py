@@ -1,70 +1,68 @@
 #!/usr/bin/python3
+# -*- coding: utf-8 -*-
+"""File Storage Module
+This module is in charge of the storage of the
+classes and their management.
 """
-filestorage class module
-"""
+
 import json
-from models.base_model import BaseModel
-from models.user import User
-from models.state import State
-from models.city import City
 from models.amenity import Amenity
+from models.base_model import BaseModel
+from models.city import City
 from models.place import Place
 from models.review import Review
+from models.state import State
+from models.user import User
+from os import path
 
 
 class FileStorage:
-    """Serializes instances to a JSON fil
-    e and deserializes JSON file to instances."""
-    __file_path = 'file.json'
+    """File Storage Class
+    This is the File Storage module.
+    Attributes:
+        __file_path (str): This is the path of the JSON file in which
+            the contents of the `__objects` variable will be stored.
+        __objects (dict): This store all the instances data
+    """
+    __file_path = 'objects.json'
     __objects = {}
 
     def all(self):
-        """Returns the dictionary __objects"""
+        """Gets the __objects info
+        Returns the content of the `__objects` class attribute.
+        """
         return self.__objects
 
     def new(self, obj):
-        """Sets in __objects the obj with key <obj class name>.id"""
-        self.__objects["{}.{}".format(obj.__class__.__name__, obj.id)] = obj
+        """Saves a new object in the `__objects` class attribute
+        Args:
+            obj (inst): The object to adds in the `__objects` class attribute
+        Sets in the `__objects` class attribute the instance data
+        with a key as <obj class name>.id.
+        """
+        key = obj.__class__.__name__ + '.' + obj.id
+        self.__objects[key] = obj
 
     def save(self):
-        """Serializes __objects to the JSON file (path: __file_path)"""
-        obj_dict = {key: obj.to_dict() for key, obj in self.__objects.items()}
-        with open(self.__file_path, 'w') as f:
-            json.dump(obj_dict, f)
+        """Serializes the content of `__objects` class attribute
+        The content of `__objects` class attribute will be serialized
+        to the path of `__file_path` class attribute in JSON format
+        with the `created_at` and `updated_at` formatted.
+        """
+        json_dict = {}
+        for k, v in self.__objects.items():
+            json_dict[k] = v.to_dict()
+        with open(self.__file_path, mode='w', encoding='utf-8') as f:
+            f.write(json.dumps(json_dict))
 
     def reload(self):
-        """Deserializes the JSON file to __objects"""
-        try:
-            with open(self.__file_path, 'r') as f:
-                obj_dict = json.load(f)
-            for key, value in obj_dict.items():
-                cls_name = value['__class__']
-                if cls_name == 'BaseModel':
-                    self.__objects[key] = BaseModel(**value)
-                elif cls_name == 'User':
-                    self.__objects[key] = User(**value)
-                elif cls_name == 'State':
-                    self.__objects[key] = State(**value)
-                elif cls_name == 'City':
-                    self.__objects[key] = City(**value)
-                elif cls_name == 'Amenity':
-                    self.__objects[key] = Amenity(**value)
-                elif cls_name == 'Place':
-                    self.__objects[key] = Place(**value)
-                elif cls_name == 'Review':
-                    self.__objects[key] = Review(**value)
-                # Add other class checks as needed
-        except FileNotFoundError:
-            pass
-# Ensure globals dictionary contains all classes
-
-
-globals().update({
-    'BaseModel': BaseModel,
-    'User': User,
-    'State': State,
-    'City': City,
-    'Amenity': Amenity,
-    'Place': Place,
-    'Review': Review
-})
+        """Deserializes the JSON file in `__file_path` class attribute
+        If the file on `__file_path` class attribute exists, each object
+        on the file will be deserialized and appended to the `__objects`
+        class attribute like an instance with the object data.
+        """
+        if path.exists(self.__file_path):
+            with open(self.__file_path, mode='r', encoding='utf-8') as f:
+                json_dict = json.loads(f.read())
+                for k, v in json_dict.items():
+                    self.__objects[k] = eval(v['__class__'])(**v)
