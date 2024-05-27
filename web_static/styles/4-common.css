@@ -1,0 +1,19 @@
+.html, .body{
+	height: 100%;
+}
+
+body{
+	margin: 0px;
+	padding: 0px;
+	font-color: #484848;
+	font-size: 14px;
+	font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.container{
+	color: blue;
+	height: 70px;
+	width: 100%;
+	border: 1px #DDDDDD;
+	border-radius: 4px;
+}
